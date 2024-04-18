@@ -3,15 +3,20 @@ package com.hwann.marketmate;
 import com.hwann.marketmate.member.Authority;
 import com.hwann.marketmate.member.Member;
 import com.hwann.marketmate.member.MemberService;
-import com.hwann.marketmate.member.MemberServiceImpl;
 import com.hwann.marketmate.order.Order;
 import com.hwann.marketmate.order.OrderService;
-import com.hwann.marketmate.order.OrderServiceImpl;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 public class OrderApp {
     public static void main(String[] args) {
-        MemberService memberService = new MemberServiceImpl();
-        OrderService orderService = new OrderServiceImpl();
+        /*AppConfig appConfig = new AppConfig();
+        MemberService memberService = appConfig.memberService();
+        OrderService orderService = appConfig.orderService();*/
+        ApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
+
+        MemberService memberService = applicationContext.getBean("memberService", MemberService.class);
+        OrderService orderService = applicationContext.getBean("orderService", OrderService.class);
 
         Long memberId=1L;
         Member member = new Member(memberId, "member1", Authority.admin);
