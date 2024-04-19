@@ -7,5 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class MarketmateApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MarketmateApplication.class, args);
+		System.out.println("Spring is running...");
 	}
 }
