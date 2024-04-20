@@ -4,6 +4,7 @@ import com.hwann.marketmate.dto.UserRegistrationDto;
 import com.hwann.marketmate.dto.LoginDto;
 import com.hwann.marketmate.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,9 +26,11 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> loginUser(@RequestBody LoginDto loginDto) {
-        String token = userService.login(loginDto);
-        return ResponseEntity.ok(token);
+    public ResponseEntity<?> loginUser(@RequestBody LoginDto loginDto) throws Exception {
+        String accessToken = userService.login(loginDto);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        return ResponseEntity.ok().headers(headers).build();
     }
 
     @PostMapping("/logout")

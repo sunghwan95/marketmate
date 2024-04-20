@@ -4,8 +4,10 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
-.docker-compose.yaml
+docker-compose.yaml
 mysql/data/
+/.env
+main/resources/application.properties
 
 ### STS ###
 .apt_generated

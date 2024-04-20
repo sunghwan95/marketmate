@@ -3,7 +3,7 @@ package com.hwann.marketmate.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
+@Entity(name = "users")
 @Getter
 @Setter
 @NoArgsConstructor
