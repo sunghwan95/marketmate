@@ -23,7 +23,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final CryptoUtil cryptoUtil;
     private final JwtTokenUtil jwtTokenUtil;
-    private final RedisTemplate<String,String> stringRedisTemplate;
+    private final RedisTemplate<String, String> stringRedisTemplate;
 
     @Override
     public void register(UserRegistrationDto userRegistrationDto) throws Exception {
@@ -51,6 +51,7 @@ public class UserServiceImpl implements UserService {
 
             stringRedisTemplate.opsForValue().set(refreshToken, userEmail, 30, TimeUnit.DAYS);
 
+            System.out.println(refreshToken);
             return accessToken;
         } else {
             throw new IllegalArgumentException("Password mismatch");
@@ -58,9 +59,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void logout(String token) {
-        // 로그아웃 로직 구현
+    public boolean logout(String refreshToken) {
+        Boolean deleted = stringRedisTemplate.delete(refreshToken);
+        return deleted != null && deleted;
     }
+
 
     @Override
     public User updateUserInfo(Long userId, User updateDetails) {

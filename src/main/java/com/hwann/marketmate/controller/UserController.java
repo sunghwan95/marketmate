@@ -3,21 +3,19 @@ package com.hwann.marketmate.controller;
 import com.hwann.marketmate.dto.UserRegistrationDto;
 import com.hwann.marketmate.dto.LoginDto;
 import com.hwann.marketmate.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-
     private final UserService userService;
 
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<Object> registerUser(@RequestBody UserRegistrationDto userRegistrationDto) throws Exception {
@@ -34,9 +32,13 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser(@RequestHeader("Authorization") String token) {
-        userService.logout(token);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> logoutUser(@RequestHeader("Authorization") String refreshToken) {
+        boolean logoutSuccess = userService.logout(refreshToken);
+        if (logoutSuccess) {
+            return ResponseEntity.ok("로그아웃 성공");
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("로그아웃 실패");
+        }
     }
 
 //    @PutMapping("/{id}")
