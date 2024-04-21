@@ -5,8 +5,6 @@ import com.hwann.marketmate.repository.UserRepository;
 import com.hwann.marketmate.service.EmailService;
 import com.hwann.marketmate.util.CryptoUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.mail.SimpleMailMessage;
@@ -25,17 +23,8 @@ public class EmailServiceImpl implements EmailService {
     private final StringRedisTemplate redisTemplate;
 
     @Override
-    public String generateVerificationCode() {
-        return new Random().ints(0, 10)
-                .limit(6)
-                .collect(StringBuilder::new, StringBuilder::append, StringBuilder::append)
-                .toString();
-    }
-
-    @Override
     public void sendVerificationCode(String email) {
         String verificationCode = generateVerificationCode();
-        System.out.println("인증 코드 :" + verificationCode);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
         message.setSubject("Verification Code");
@@ -45,21 +34,19 @@ public class EmailServiceImpl implements EmailService {
         saveVerificationCode(email, verificationCode);
     }
 
-    @Override
-    public void saveVerificationCode(String email, String code) {
+    private String generateVerificationCode() {
+        return String.valueOf(new Random().nextInt(900000) + 100000);
+    }
+
+    private void saveVerificationCode(String email, String code) {
         ValueOperations<String, String> ops = redisTemplate.opsForValue();
         ops.set(email, code, 5, TimeUnit.MINUTES);
     }
 
     @Override
-    public String getSavedVerificationCode(String email) {
-        return redisTemplate.opsForValue().get(email);
-    }
-
-    @Override
-    public boolean verifyEmail(String verificationCode, String email) {
-        String savedCode = getSavedVerificationCode(email);
-        return verificationCode.equals(savedCode);
+    public boolean verifyEmail(String code, String email) {
+        String savedCode = redisTemplate.opsForValue().get(email);
+        return code.equals(savedCode);
     }
 
     @Override
