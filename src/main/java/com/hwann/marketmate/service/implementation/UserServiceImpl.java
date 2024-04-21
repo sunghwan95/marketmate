@@ -41,17 +41,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String login(LoginDto loginDto) throws Exception {
-        String userEmail = cryptoUtil.encrypt(loginDto.email);
-        User user = userRepository.findByEmail(userEmail)
+        String userEmail = loginDto.email;
+        User user = userRepository.findByEmail(cryptoUtil.encrypt(userEmail))
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         if (passwordEncoder.matches(loginDto.password, user.getPassword())) {
             String accessToken = jwtTokenUtil.generateAccessToken(userEmail);
             String refreshToken = jwtTokenUtil.generateRefreshToken(userEmail);
 
-            stringRedisTemplate.opsForValue().set(refreshToken, userEmail, 30, TimeUnit.DAYS);
+            stringRedisTemplate.opsForValue().set(cryptoUtil.encrypt(userEmail), refreshToken, 30, TimeUnit.DAYS);
 
-            System.out.println(refreshToken);
+            accessToken = "Bearer " + accessToken;
             return accessToken;
         } else {
             throw new IllegalArgumentException("Password mismatch");
@@ -59,11 +59,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean logout(String refreshToken) {
-        Boolean deleted = stringRedisTemplate.delete(refreshToken);
-        return deleted != null && deleted;
-    }
+    public boolean logout(String accessToken) {
+        try {
+            String userEmail = jwtTokenUtil.getEmailFromToken(accessToken.replace("Bearer ", ""));
+            String encryptedEmail = cryptoUtil.encrypt(userEmail);
 
+            return Boolean.TRUE.equals(stringRedisTemplate.delete(encryptedEmail));
+        } catch (Exception e) {
+            System.out.println("로그아웃 오류: " + e.getMessage());
+            return false;
+        }
+    }
 
     @Override
     public User updateUserInfo(Long userId, User updateDetails) {

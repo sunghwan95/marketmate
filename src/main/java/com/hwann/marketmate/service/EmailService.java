@@ -10,4 +10,6 @@ public interface EmailService {
     String getSavedVerificationCode(String email);
 
     boolean verifyEmail(String verificationCode, String email);
+
+    void updateEmailVerifiedStatus(String email, boolean b) throws Exception;
 }

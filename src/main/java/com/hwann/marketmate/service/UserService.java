@@ -9,7 +9,7 @@ public interface UserService {
 
     String login(LoginDto loginDto) throws Exception;
 
-    boolean logout(String token);
+    boolean logout(String refreshToken);
 
     User updateUserInfo(Long userId, User updateDetails);
 }

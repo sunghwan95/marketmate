@@ -1,6 +1,10 @@
 package com.hwann.marketmate.service.implementation;
 
+import com.hwann.marketmate.entity.User;
+import com.hwann.marketmate.repository.UserRepository;
 import com.hwann.marketmate.service.EmailService;
+import com.hwann.marketmate.util.CryptoUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -13,17 +17,12 @@ import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@RequiredArgsConstructor
 public class EmailServiceImpl implements EmailService {
-    @Autowired
-    private JavaMailSender mailSender;
-
-    @Autowired
-    private StringRedisTemplate redisTemplate; // Redis 템플릿 추가
-
-    public EmailServiceImpl(JavaMailSender mailSender, StringRedisTemplate redisTemplate) {
-        this.mailSender = mailSender;
-        this.redisTemplate = redisTemplate;
-    }
+    private final JavaMailSender mailSender;
+    private final UserRepository userRepository;
+    private final CryptoUtil cryptoUtil;
+    private final StringRedisTemplate redisTemplate;
 
     @Override
     public String generateVerificationCode() {
@@ -36,6 +35,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void sendVerificationCode(String email) {
         String verificationCode = generateVerificationCode();
+        System.out.println("인증 코드 :" + verificationCode);
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(email);
         message.setSubject("Verification Code");
@@ -48,7 +48,7 @@ public class EmailServiceImpl implements EmailService {
     @Override
     public void saveVerificationCode(String email, String code) {
         ValueOperations<String, String> ops = redisTemplate.opsForValue();
-        ops.set(email, code, 5, TimeUnit.MINUTES); // 5분 후 만료
+        ops.set(email, code, 5, TimeUnit.MINUTES);
     }
 
     @Override
@@ -60,5 +60,13 @@ public class EmailServiceImpl implements EmailService {
     public boolean verifyEmail(String verificationCode, String email) {
         String savedCode = getSavedVerificationCode(email);
         return verificationCode.equals(savedCode);
+    }
+
+    @Override
+    public void updateEmailVerifiedStatus(String email, boolean isVerified) throws Exception {
+        User user = userRepository.findByEmail(cryptoUtil.encrypt(email))
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+        user.setEmailVerified(isVerified);
+        userRepository.save(user);
     }
 }
