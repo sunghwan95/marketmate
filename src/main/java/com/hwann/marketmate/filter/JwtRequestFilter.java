@@ -15,13 +15,12 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
 @Component
 public class JwtRequestFilter extends OncePerRequestFilter {
-
     @Autowired
     private JwtTokenUtil jwtTokenUtil;
-
     @Autowired
     private RedisTemplate<String, String> redisTemplate;
 
@@ -40,18 +39,24 @@ public class JwtRequestFilter extends OncePerRequestFilter {
 
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             if (jwtTokenUtil.validateToken(jwtToken)) {
-                UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(
-                        userEmail, null, new ArrayList<>());
-                usernamePasswordAuthenticationToken
-                        .setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        userEmail, null, Collections.emptyList());
+                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             } else {
+                // 토큰이 만료되거나 유효하지 않은 경우
                 String refreshToken = redisTemplate.opsForValue().get(userEmail);
                 if (refreshToken != null && jwtTokenUtil.validateToken(refreshToken)) {
-                    String newToken = jwtTokenUtil.generateAccessToken(userEmail);
-                    response.setHeader("New-AccessToken", "Bearer " + newToken);
+                    String newAccessToken = jwtTokenUtil.generateAccessToken(userEmail);
+                    response.setHeader("Authorization", "Bearer " + newAccessToken); // 표준 'Authorization' 헤더 사용 권장
+
+                    // 새로운 accessToken을 이용해 새로운 인증 객체 생성
+                    UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                            userEmail, null, Collections.emptyList());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
                 } else {
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Please log in again.");
+                    return;
                 }
             }
         }

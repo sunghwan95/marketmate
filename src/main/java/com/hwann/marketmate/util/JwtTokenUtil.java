@@ -40,11 +40,6 @@ public class JwtTokenUtil {
     }
 
     public String getEmailFromToken(String token) {
-        if (token != null && token.startsWith("Bearer ")) {
-            token = token.substring(7);
-        } else {
-            return "인증 실패";
-        }
         Claims claims = Jwts.parser()
                 .setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
                 .parseClaimsJws(token)
@@ -54,9 +49,6 @@ public class JwtTokenUtil {
 
     public boolean validateToken(String token) {
         try {
-            if (token != null && token.startsWith("Bearer ")) {
-                token = token.substring(7);
-            }
             final Claims claims = extractAllClaims(token);
             final Date expiration = claims.getExpiration();
             return !expiration.before(new Date());
