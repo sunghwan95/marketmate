@@ -1,6 +1,6 @@
 package com.hwann.marketmate.service;
 
-import com.hwann.marketmate.entity.User;
+import com.hwann.marketmate.dto.UpdateUserInfoDto;
 import com.hwann.marketmate.dto.UserRegistrationDto;
 import com.hwann.marketmate.dto.LoginDto;
 
@@ -9,7 +9,7 @@ public interface UserService {
 
     String login(LoginDto loginDto) throws Exception;
 
-    boolean logout(String refreshToken);
+    void logout(String accessToken);
 
-    User updateUserInfo(Long userId, User updateDetails);
+    void updateUserDetails(String email, UpdateUserInfoDto updateUserInfoDtd) throws Exception;
 }

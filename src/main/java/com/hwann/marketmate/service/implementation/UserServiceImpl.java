@@ -1,5 +1,6 @@
 package com.hwann.marketmate.service.implementation;
 
+import com.hwann.marketmate.dto.UpdateUserInfoDto;
 import com.hwann.marketmate.entity.User;
 import com.hwann.marketmate.repository.UserRepository;
 import com.hwann.marketmate.service.UserService;
@@ -59,21 +60,32 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean logout(String accessToken) {
+    public void logout(String accessToken) {
         try {
             String userEmail = jwtTokenUtil.getEmailFromToken(accessToken.replace("Bearer ", ""));
             String encryptedEmail = cryptoUtil.encrypt(userEmail);
 
-            return Boolean.TRUE.equals(stringRedisTemplate.delete(encryptedEmail));
+            stringRedisTemplate.delete(encryptedEmail);
         } catch (Exception e) {
             System.out.println("로그아웃 오류: " + e.getMessage());
-            return false;
         }
     }
 
     @Override
-    public User updateUserInfo(Long userId, User updateDetails) {
-        // 사용자 정보 업데이트 로직 구현
-        return updateDetails;
+    public void updateUserDetails(String email, UpdateUserInfoDto updateUserInfoDto) throws Exception {
+        User user = userRepository.findByEmail(cryptoUtil.encrypt(email))
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (updateUserInfoDto.address != null) {
+            user.setAddress(cryptoUtil.encrypt(updateUserInfoDto.address));
+        }
+        if (updateUserInfoDto.phoneNumber != null) {
+            user.setPhoneNumber(cryptoUtil.encrypt(updateUserInfoDto.phoneNumber));
+        }
+        if (updateUserInfoDto.password != null) {
+            user.setPassword(cryptoUtil.encrypt(updateUserInfoDto.password));
+        }
+
+        userRepository.save(user);
     }
 }
