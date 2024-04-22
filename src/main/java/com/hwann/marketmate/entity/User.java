@@ -3,6 +3,9 @@ package com.hwann.marketmate.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity(name = "users")
 @Getter
 @Setter
@@ -12,7 +15,7 @@ import lombok.*;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -31,4 +34,10 @@ public class User {
 
     @Column(nullable = false)
     private boolean emailVerified = false;
+
+    @OneToMany(mappedBy = "user")
+    private List<WishlistItem> wishlistItems = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Order> orders = new ArrayList<>();
 }
