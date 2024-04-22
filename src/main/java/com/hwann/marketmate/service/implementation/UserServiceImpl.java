@@ -109,11 +109,4 @@ public class UserServiceImpl implements UserService {
                 .map(item -> new WishlistItemDto(item.getProduct().getProductId(), item.getProduct().getName()))
                 .collect(Collectors.toList());
     }
-
-    @Override
-    public User getCurrentUser(Authentication authentication) {
-        String email = (String) authentication.getPrincipal();
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다: " + email));
-    }
 }

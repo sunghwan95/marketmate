@@ -5,6 +5,7 @@ import com.hwann.marketmate.dto.WishlistItemDto;
 import com.hwann.marketmate.entity.*;
 import com.hwann.marketmate.repository.*;
 import com.hwann.marketmate.service.WishlistService;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +21,10 @@ public class WishlistServiceImpl implements WishlistService {
     private final CartItemRepository cartItemRepository;
 
     @Override
-    public void addToWishlist(WishlistDto wishlistDto, WishlistItemDto wishlistItemDto) {
+    public void addToWishlist(@Nullable WishlistDto wishlistDto, WishlistItemDto wishlistItemDto) {
         Product product = productRepository.findById(wishlistItemDto.getProductId())
                 .orElseThrow(() -> new RuntimeException("Product not found"));
+        assert wishlistDto != null;
         Wishlist wishlist = wishlistRepository.findByUserId(wishlistDto.getUserId())
                 .orElseThrow(() -> new RuntimeException("Wishlist not found"));
         WishlistItem wishlistItem = new WishlistItem();

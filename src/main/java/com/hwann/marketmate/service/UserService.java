@@ -18,7 +18,5 @@ public interface UserService {
 
     void updateUserDetails(String email, UpdateUserInfoDto updateUserInfoDtd) throws Exception;
 
-    User getCurrentUser(Authentication authentication);
-
     List<WishlistItemDto> getUserWishlistItems(Authentication authentication) throws Exception;
 }
