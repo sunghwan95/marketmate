@@ -16,7 +16,5 @@ public interface UserService {
 
     void logout(String accessToken);
 
-    void updateUserDetails(String email, UpdateUserInfoDto updateUserInfoDtd) throws Exception;
-
-    List<WishlistItemDto> getUserWishlistItems(Authentication authentication) throws Exception;
+    void updateUserDetails(Long userId, UpdateUserInfoDto updateUserInfoDtd) throws Exception;
 }

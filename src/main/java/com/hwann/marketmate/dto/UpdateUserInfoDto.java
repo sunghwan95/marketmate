@@ -1,7 +1,10 @@
 package com.hwann.marketmate.dto;
 
+import lombok.Data;
+
+@Data
 public class UpdateUserInfoDto {
-    public String address;
-    public String phoneNumber;
-    public String password;
+    private String address;
+    private String phoneNumber;
+    private String password;
 }

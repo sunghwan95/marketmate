@@ -7,8 +7,12 @@ import com.hwann.marketmate.repository.*;
 import com.hwann.marketmate.service.WishlistService;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -58,5 +62,16 @@ public class WishlistServiceImpl implements WishlistService {
         cartItemRepository.save(cartItem);
 
         wishlistItemRepository.delete(wishlistItem);
+    }
+
+    @Override
+    public List<WishlistItemDto> getUserWishlistItems(Authentication authentication) throws Exception {
+        User currentUser = getCurrentUser(authentication);
+        Wishlist wishlist = wishlistRepository.findByUserId(currentUser.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("Wishlist not found"));
+
+        return wishlistItemRepository.findByWishlistId(wishlist.getWishlistId()).stream()
+                .map(item -> new WishlistItemDto(item.getProduct().getProductId(), item.getProduct().getName()))
+                .collect(Collectors.toList());
     }
 }

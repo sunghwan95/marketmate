@@ -1,9 +1,12 @@
 package com.hwann.marketmate.dto;
 
+import lombok.Data;
+
+@Data
 public class UserRegistrationDto {
-    public String username;
-    public String email;
-    public String password;
-    public String address;
-    public String phoneNumber;
+    private String username;
+    private String email;
+    private String password;
+    private String address;
+    private String phoneNumber;
 }
