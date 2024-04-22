@@ -1,16 +1,15 @@
 package com.hwann.marketmate.service;
 
 import com.hwann.marketmate.dto.OrderDto;
-import com.hwann.marketmate.entity.Order;
 
 import java.util.List;
 
 public interface OrderService {
-    public Order placeOrder(OrderDto orderDto, Long userId);
+    void cancelOrder(Long orderId) throws Exception;
 
-    public List<Order> getAllOrders(Long userId);
+    void returnOrder(Long orderId) throws Exception;
 
-    public Order cancelOrder(Long orderId) ;
+    void createOrderFromCartItems(Long userId, List<Long> cartItemIds);
 
-    public Order returnOrder(Long orderId);
+    OrderDto getOrderStatus(Long orderId) throws Exception;
 }

@@ -3,6 +3,8 @@ package com.hwann.marketmate.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity(name = "order_items")
 @Getter
 @Setter
@@ -14,14 +16,14 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long orderItemId;
 
-    @ManyToOne
-    @JoinColumn(name = "productId")
-    private Product product;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "orderId")
     private Order order;
 
-    private int quantity;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "productId")
+    private Product product;
 
+    private int quantity;
+    private LocalDateTime createdAt;
 }

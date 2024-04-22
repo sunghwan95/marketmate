@@ -3,6 +3,7 @@ package com.hwann.marketmate.util;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
+
 import org.springframework.stereotype.Component;
 
 @Component
@@ -12,7 +13,6 @@ public class CryptoUtil {
     private final SecretKeySpec secretKeySpec;
 
     public CryptoUtil() {
-        // 키 초기화 로직
         String key = "oingisprettyintheworld1234567890";
         byte[] decodedKey = Base64.getDecoder().decode(key);
         this.secretKeySpec = new SecretKeySpec(decodedKey, 0, decodedKey.length, AES);

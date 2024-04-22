@@ -3,22 +3,24 @@ package com.hwann.marketmate.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity(name = "wishlist_items")
+@Entity(name = "cart_items")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class WishlistItem {
+public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long wishlistItemId;
+    private Long cartItemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "wishlistId")
-    private Wishlist wishlist;
+    @JoinColumn(name = "cartId")
+    private Cart cart;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "productId")
     private Product product;
+
+    private int quantity;
 }

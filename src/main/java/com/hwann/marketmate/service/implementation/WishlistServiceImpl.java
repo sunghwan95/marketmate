@@ -1,33 +1,33 @@
 package com.hwann.marketmate.service.implementation;
 
+import com.hwann.marketmate.dto.WishlistDto;
 import com.hwann.marketmate.dto.WishlistItemDto;
-import com.hwann.marketmate.entity.Product;
-import com.hwann.marketmate.entity.User;
-import com.hwann.marketmate.entity.WishlistItem;
-import com.hwann.marketmate.repository.ProductRepository;
-import com.hwann.marketmate.repository.WishlistItemRepository;
+import com.hwann.marketmate.entity.*;
+import com.hwann.marketmate.repository.*;
 import com.hwann.marketmate.service.WishlistService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class WishlistServiceImpl implements WishlistService {
+    private final WishlistRepository wishlistRepository;
     private final WishlistItemRepository wishlistItemRepository;
     private final ProductRepository productRepository;
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
 
     @Override
-    public void addToWishlist(Long productId, User user) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new IllegalArgumentException("상품을 찾을 수 없습니다."));
-
+    public void addToWishlist(WishlistDto wishlistDto, WishlistItemDto wishlistItemDto) {
+        Product product = productRepository.findById(wishlistItemDto.getProductId())
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+        Wishlist wishlist = wishlistRepository.findByUserId(wishlistDto.getUserId())
+                .orElseThrow(() -> new RuntimeException("Wishlist not found"));
         WishlistItem wishlistItem = new WishlistItem();
-        wishlistItem.setProduct(Optional.ofNullable(product));
-        wishlistItem.setUser(user);
+        wishlistItem.setProduct(product);
+        wishlistItem.setWishlist(wishlist);
         wishlistItemRepository.save(wishlistItem);
     }
 
@@ -37,14 +37,24 @@ public class WishlistServiceImpl implements WishlistService {
     }
 
     @Override
-    public List<WishlistItemDto> getWishlist(User user) {
-        List<WishlistItem> wishlistItems = wishlistItemRepository.findByUser(user);
-        return wishlistItems.stream()
-                .map(wishlistItem -> {
-                    WishlistItemDto dto = new WishlistItemDto();
-                    dto.setProductId(wishlistItem.getProduct().orElseThrow().getProductId());
-                    return dto;
-                })
-                .collect(Collectors.toList());
+    public void addToCart(Long wishlistItemId) {
+        WishlistItem wishlistItem = wishlistItemRepository.findById(wishlistItemId)
+                .orElseThrow(() -> new RuntimeException("Wishlist item not found"));
+
+        User user = wishlistItem.getWishlist().getUser();
+        Cart cart = cartRepository.findByUserId(user.getUserId())
+                .orElseGet(() -> {
+                    Cart newCart = new Cart();
+                    newCart.setUser(user);
+                    return newCart;
+                });
+
+        CartItem cartItem = new CartItem();
+        cartItem.setCart(cart);
+        cartItem.setProduct(wishlistItem.getProduct());
+        cartItem.setQuantity(1);
+        cartItemRepository.save(cartItem);
+
+        wishlistItemRepository.delete(wishlistItem);
     }
 }

@@ -1,8 +1,12 @@
 package com.hwann.marketmate.service.implementation;
 
 import com.hwann.marketmate.dto.UpdateUserInfoDto;
+import com.hwann.marketmate.dto.WishlistItemDto;
 import com.hwann.marketmate.entity.User;
+import com.hwann.marketmate.entity.Wishlist;
 import com.hwann.marketmate.repository.UserRepository;
+import com.hwann.marketmate.repository.WishlistItemRepository;
+import com.hwann.marketmate.repository.WishlistRepository;
 import com.hwann.marketmate.service.UserService;
 import com.hwann.marketmate.dto.UserRegistrationDto;
 import com.hwann.marketmate.dto.LoginDto;
@@ -16,7 +20,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -26,6 +32,8 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final CryptoUtil cryptoUtil;
     private final JwtTokenUtil jwtTokenUtil;
+    private final WishlistRepository wishlistRepository;
+    private final WishlistItemRepository wishlistItemRepository;
     private final RedisTemplate<String, String> stringRedisTemplate;
 
     @Override
@@ -54,7 +62,7 @@ public class UserServiceImpl implements UserService {
 
             stringRedisTemplate.opsForValue().set(cryptoUtil.encrypt(userEmail), refreshToken, 30, TimeUnit.DAYS);
 
-            accessToken = "Bearer " + accessToken;
+            accessToken = STR."Bearer \{accessToken}";
             return accessToken;
         } else {
             throw new IllegalArgumentException("Password mismatch");
@@ -69,7 +77,7 @@ public class UserServiceImpl implements UserService {
 
             stringRedisTemplate.delete(encryptedEmail);
         } catch (Exception e) {
-            System.out.println("로그아웃 오류: " + e.getMessage());
+            System.out.println(STR."로그아웃 오류: \{e.getMessage()}");
         }
     }
 
@@ -89,6 +97,17 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepository.save(user);
+    }
+
+    @Override
+    public List<WishlistItemDto> getUserWishlistItems(Authentication authentication) throws Exception {
+        User currentUser = getCurrentUser(authentication);
+        Wishlist wishlist = wishlistRepository.findByUserId(currentUser.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("Wishlist not found"));
+
+        return wishlistItemRepository.findByWishlistId(wishlist.getWishlistId()).stream()
+                .map(item -> new WishlistItemDto(item.getProduct().getProductId(), item.getProduct().getName()))
+                .collect(Collectors.toList());
     }
 
     @Override

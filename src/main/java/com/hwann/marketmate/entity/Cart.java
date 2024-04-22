@@ -3,24 +3,23 @@ package com.hwann.marketmate.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.HashSet;
 import java.util.Set;
 
-@Entity(name = "wishlists")
+@Entity(name = "carts")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Wishlist {
+public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long wishlistId;
+    private Long cartId;
 
     @OneToOne
     @JoinColumn(name = "userId", referencedColumnName = "userId")
     private User user;
 
-    @OneToMany(mappedBy = "wishlist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<WishlistItem> items = new HashSet<>();
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<CartItem> items;
 }
