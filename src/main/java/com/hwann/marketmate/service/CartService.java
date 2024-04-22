@@ -11,5 +11,5 @@ public interface CartService {
 
     void updateCartItemQuantity(Long cartItemId, int quantity);
 
-    void orderCheckedProduct(Long userId, List<Long> cartItemIds);
+    void moveItemsToOrderService(Long userId, List<Long> cartItemIds);
 }

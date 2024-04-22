@@ -24,6 +24,7 @@ public class CartServiceImpl implements CartService {
     private final ProductRepository productRepository;
     private final OrderService orderService;
 
+    @Override
     public void addItemToCart(Long userId, CartItemDto cartItemDto) {
         Product product = productRepository.findById(cartItemDto.getProductId())
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
@@ -52,7 +53,7 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void orderCheckedProduct(Long userId, List<Long> cartItemIds) {
+    public void moveItemsToOrderService(Long userId, List<Long> cartItemIds) {
         orderService.createOrderFromCartItems(userId, cartItemIds);
     }
 }

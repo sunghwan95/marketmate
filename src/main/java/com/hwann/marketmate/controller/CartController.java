@@ -2,19 +2,18 @@ package com.hwann.marketmate.controller;
 
 import com.hwann.marketmate.dto.CartItemDto;
 import com.hwann.marketmate.service.CartService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/cart")
 public class CartController {
     private final CartService cartService;
 
-    public CartController(CartService cartService) {
-        this.cartService = cartService;
-    }
 
     @PostMapping("/add")
     public ResponseEntity<?> addItemToCart(@RequestParam Long userId, @RequestBody CartItemDto cartItemDto) {
@@ -34,15 +33,9 @@ public class CartController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/checkout/selected")
+    @PostMapping("/deliver/selected")
     public ResponseEntity<?> checkoutSelectedItems(@RequestParam Long userId, @RequestBody List<Long> cartItemIds) {
-        cartService.checkout(userId, cartItemIds);
-        return ResponseEntity.ok().build();
-    }
-
-    @PostMapping("/checkout/all")
-    public ResponseEntity<?> checkoutAllItems(@RequestParam Long userId) {
-        cartService.checkoutAll(userId);
+        cartService.moveItemsToOrderService(userId, cartItemIds);
         return ResponseEntity.ok().build();
     }
 }
