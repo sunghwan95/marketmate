@@ -49,9 +49,4 @@ public class CartServiceImpl implements CartService {
         cartItem.setQuantity(quantity);
         cartItemRepository.save(cartItem);
     }
-
-    @Override
-    public void moveItemsToOrderService(Long userId, List<Long> cartItemIds) {
-        orderService.createOrderFromCartItems(userId, cartItemIds);
-    }
 }

@@ -12,6 +12,4 @@ public interface CartService {
     void removeItemFromCart(Long cartItemId);
 
     void updateCartItemQuantity(Long cartItemId, int quantity);
-
-    void moveItemsToOrderService(Long userId, List<Long> cartItemIds);
 }

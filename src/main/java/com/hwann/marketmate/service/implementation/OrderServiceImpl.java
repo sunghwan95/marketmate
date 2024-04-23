@@ -5,7 +5,6 @@ import com.hwann.marketmate.entity.*;
 import com.hwann.marketmate.repository.CartItemRepository;
 import com.hwann.marketmate.repository.OrderRepository;
 import com.hwann.marketmate.repository.ProductRepository;
-import com.hwann.marketmate.repository.UserRepository;
 import com.hwann.marketmate.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,14 +20,10 @@ import java.util.List;
 public class OrderServiceImpl implements OrderService {
     private final OrderRepository orderRepository;
     private final ProductRepository productRepository;
-    private final UserRepository userRepository;
     private final CartItemRepository cartItemRepository;
 
     @Override
-    public void createOrderFromCartItems(Long userId, List<Long> cartItemIds) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
+    public void createOrderFromCartItems(User user, List<Long> cartItemIds) {
         List<CartItem> cartItems = cartItemRepository.findAllById(cartItemIds);
         if (cartItems.isEmpty()) {
             throw new IllegalArgumentException("No cart items found for given IDs");
