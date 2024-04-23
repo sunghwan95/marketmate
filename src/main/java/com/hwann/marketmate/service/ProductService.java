@@ -1,14 +1,16 @@
 package com.hwann.marketmate.service;
 
-import com.hwann.marketmate.dto.ProductDto;
+import com.hwann.marketmate.dto.ProductRegistrationDto;
 import com.hwann.marketmate.entity.Product;
 
 import java.util.List;
 
 public interface ProductService {
-    public Product addProduct(ProductDto productDto);
+    Product registerProduct(ProductRegistrationDto productRegistrationDto);
 
-    public List<Product> getAllProducts();
+    List<Product> getAllProducts();
 
-    public Product getProductById(Long productId);
+    Product getProductById(Long productId);
+
+    Product findProductById(Long productId);
 }

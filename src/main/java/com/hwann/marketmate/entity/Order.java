@@ -23,7 +23,7 @@ public class Order {
     private User user;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<OrderItem> orderItems = new HashSet<>();
+    private Set<OrderDetail> orderItems = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;

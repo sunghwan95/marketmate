@@ -1,7 +1,13 @@
 package com.hwann.marketmate.service;
 
+import org.springframework.security.core.Authentication;
+
+import java.util.Map;
+
 public interface EmailService {
-    void sendVerificationCode(String email);
-    boolean verifyEmail(String code, String email);
-    void updateEmailVerifiedStatus(String email, boolean isVerified) throws Exception;
+    String sendVerificationCode(Authentication authentication) throws Exception;
+
+    Map<String, Boolean> verifyEmail(String code, Authentication authentication);
+
+    void updateEmailVerifiedStatus(String email, boolean isVerified);
 }

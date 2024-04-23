@@ -1,6 +1,5 @@
 package com.hwann.marketmate.dto;
 
-import com.hwann.marketmate.entity.OrderItem;
 import lombok.Data;
 
 import java.util.List;

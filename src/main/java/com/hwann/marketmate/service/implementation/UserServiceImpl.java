@@ -10,6 +10,7 @@ import com.hwann.marketmate.util.CryptoUtil;
 import com.hwann.marketmate.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,7 @@ public class UserServiceImpl implements UserService {
                 .address(cryptoUtil.encrypt(userRegistrationDto.getAddress()))
                 .phoneNumber(cryptoUtil.encrypt(userRegistrationDto.getPhoneNumber()))
                 .emailVerified(false)
+                .userRole(userRegistrationDto.getRole())
                 .build();
 
         userRepository.save(user);
@@ -79,9 +81,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUserDetails(Long userId, UpdateUserInfoDto updateUserInfoDto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    public void updateUserDetails(Long userId, UpdateUserInfoDto updateUserInfoDto,Authentication authentication) {
+        User user = identifyUser(authentication);
 
         Optional.ofNullable(updateUserInfoDto.getAddress())
                 .ifPresent(address -> {
@@ -105,5 +106,13 @@ public class UserServiceImpl implements UserService {
                 .ifPresent(password -> user.setPassword(passwordEncoder.encode(password)));
 
         userRepository.save(user);
+    }
+
+    @Override
+    public User identifyUser(Authentication authentication){
+        Long userId = (Long) authentication.getPrincipal();
+
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
     }
 }

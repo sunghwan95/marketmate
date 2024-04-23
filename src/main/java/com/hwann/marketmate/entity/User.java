@@ -35,9 +35,6 @@ public class User {
     @Column(nullable = false)
     private boolean emailVerified = false;
 
-    @OneToMany(mappedBy = "user")
-    private List<WishlistItem> wishlistItems = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user")
-    private List<Order> orders = new ArrayList<>();
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole;
 }

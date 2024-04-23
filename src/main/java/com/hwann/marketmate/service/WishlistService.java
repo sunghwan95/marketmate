@@ -1,17 +1,18 @@
 package com.hwann.marketmate.service;
 
-import com.hwann.marketmate.dto.WishlistDto;
 import com.hwann.marketmate.dto.WishlistItemDto;
+import com.hwann.marketmate.entity.WishlistItem;
 import org.springframework.security.core.Authentication;
 
-import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public interface WishlistService {
-    void addToWishlist(WishlistDto wishlistDto, WishlistItemDto wishlistItemDto);
+    Set<WishlistItemDto> getWishlistItemsForUser(Authentication authentication);
 
-    void removeFromWishlist(Long wishlistItemId);
+    void addItemToWishlist(WishlistItemDto wishlistItemDto, Authentication authentication);
 
-    void addToCart(Long wishlistItemId);
+    void removeItemFromWishlist(Long wishlistItemId);
 
-    List<WishlistItemDto> getUserWishlistItems(Authentication authentication) throws Exception;
+    Optional<WishlistItem> findWishlistItemById(Long wishlistItemId);
 }

@@ -1,12 +1,11 @@
 package com.hwann.marketmate.service.implementation;
 
-import com.hwann.marketmate.dto.CartItemDto;
 import com.hwann.marketmate.entity.Cart;
 import com.hwann.marketmate.entity.CartItem;
 import com.hwann.marketmate.entity.Product;
+import com.hwann.marketmate.entity.User;
 import com.hwann.marketmate.repository.CartItemRepository;
 import com.hwann.marketmate.repository.CartRepository;
-import com.hwann.marketmate.repository.ProductRepository;
 import com.hwann.marketmate.service.CartService;
 import com.hwann.marketmate.service.OrderService;
 import lombok.RequiredArgsConstructor;
@@ -21,21 +20,20 @@ import java.util.List;
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
-    private final ProductRepository productRepository;
     private final OrderService orderService;
 
     @Override
-    public void addItemToCart(Long userId, CartItemDto cartItemDto) {
-        Product product = productRepository.findById(cartItemDto.getProductId())
-                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
-        Cart cart = cartRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("Cart not found"));
+    public void addItemToCart(User user, Product product) {
+        Cart cart = cartRepository.findByUserId(user.getUserId())
+                .orElseGet(() -> Cart.builder().user(user).build());
 
-        CartItem cartItem = new CartItem();
-        cartItem.setProduct(product);
-        cartItem.setQuantity(cartItemDto.getQuantity());
-        cartItem.setCart(cart);
+        CartItem cartItem = CartItem.builder()
+                .cart(cart)
+                .product(product)
+                .quantity(1)
+                .build();
 
+        cart.getItems().add(cartItem);
         cartItemRepository.save(cartItem);
     }
 

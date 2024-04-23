@@ -16,5 +16,7 @@ public interface UserService {
 
     void logout(String accessToken);
 
-    void updateUserDetails(Long userId, UpdateUserInfoDto updateUserInfoDtd) throws Exception;
+    void updateUserDetails(Long userId, UpdateUserInfoDto updateUserInfoDtd, Authentication authentication) throws Exception;
+
+    User identifyUser(Authentication authentication);
 }
