@@ -1,17 +1,16 @@
 package com.hwann.marketmate.service.implementation;
 
-import com.hwann.marketmate.dto.UpdateUserInfoDto;
+import com.hwann.marketmate.dto.*;
 import com.hwann.marketmate.entity.User;
 import com.hwann.marketmate.repository.UserRepository;
 import com.hwann.marketmate.service.UserService;
-import com.hwann.marketmate.dto.UserRegistrationDto;
-import com.hwann.marketmate.dto.LoginDto;
 import com.hwann.marketmate.util.CryptoUtil;
 import com.hwann.marketmate.util.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,8 +80,15 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUserDetails(Long userId, UpdateUserInfoDto updateUserInfoDto,Authentication authentication) {
-        User user = identifyUser(authentication);
+    public UserDetailsDto getUserDetails(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        return new UserDetailsDto(user.getId(), user.getUsername(), user.getEmail());
+    }
+
+    @Override
+    public void updateUserDetails(User user, UpdateUserInfoDto updateUserInfoDto) {
 
         Optional.ofNullable(updateUserInfoDto.getAddress())
                 .ifPresent(address -> {
@@ -109,10 +115,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User identifyUser(Authentication authentication){
+    public User identifyUser(Authentication authentication) {
         Long userId = (Long) authentication.getPrincipal();
 
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    }
+
+    @Override
+    public User identifyUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }

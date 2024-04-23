@@ -15,7 +15,7 @@ import java.util.List;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId;
+    private Long id;
 
     @Column(nullable = false, unique = true)
     private String email;
@@ -37,4 +37,10 @@ public class User {
 
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    private Cart cart;
+
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    private Wishlist wishlist;
 }

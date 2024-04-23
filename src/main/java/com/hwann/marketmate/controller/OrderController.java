@@ -2,17 +2,17 @@ package com.hwann.marketmate.controller;
 
 import com.hwann.marketmate.dto.OrderDto;
 import com.hwann.marketmate.service.OrderService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/orders")
 public class OrderController {
     private final OrderService orderService;
 
-    public OrderController(OrderService orderService) {
-        this.orderService = orderService;
-    }
 
     @GetMapping("/{orderId}")
     public ResponseEntity<OrderDto> getOrderStatus(@PathVariable Long orderId) throws Exception {

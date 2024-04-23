@@ -15,10 +15,10 @@ import java.util.Set;
 public class Wishlist {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long wishlistId;
+    private Long id;
 
-    @OneToOne
-    @JoinColumn(name = "userId", referencedColumnName = "userId")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
     @OneToMany(mappedBy = "wishlist", cascade = CascadeType.ALL, orphanRemoval = true)

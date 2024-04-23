@@ -1,9 +1,11 @@
 package com.hwann.marketmate.controller;
 
 import com.hwann.marketmate.dto.UpdateUserInfoDto;
+import com.hwann.marketmate.dto.UserDetailsDto;
 import com.hwann.marketmate.dto.UserRegistrationDto;
 import com.hwann.marketmate.dto.LoginDto;
-import com.hwann.marketmate.service.UserService;
+import com.hwann.marketmate.entity.User;
+import com.hwann.marketmate.service.implementation.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,12 +18,18 @@ import java.util.Collections;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    private final UserService userService;
+    private final UserServiceImpl userService;
+
+    @GetMapping
+    public ResponseEntity<UserDetailsDto> getUserDetails(Authentication authentication) {
+        User user = userService.identifyUser(authentication);
+        UserDetailsDto userDetails = userService.getUserDetails(user.getId());
+        return ResponseEntity.ok(userDetails);
+    }
 
     @PostMapping("/register")
     public ResponseEntity<Object> registerUser(@RequestBody UserRegistrationDto userRegistrationDto) throws Exception {
         userService.register(userRegistrationDto);
-
         return ResponseEntity.ok().build();
     }
 
@@ -47,8 +55,8 @@ public class UserController {
     @PatchMapping("/update")
     public ResponseEntity<?> updateUserDetails(@RequestBody UpdateUserInfoDto updateUserInfoDto, Authentication authentication) {
         try {
-            Long userId = (Long) authentication.getPrincipal();
-            userService.updateUserDetails(userId, updateUserInfoDto);
+            User user = userService.identifyUser(authentication);
+            userService.updateUserDetails(user, updateUserInfoDto);
 
             return ResponseEntity.ok("User details updated successfully.");
         } catch (Exception e) {

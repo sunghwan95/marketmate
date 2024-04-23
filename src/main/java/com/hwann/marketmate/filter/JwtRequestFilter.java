@@ -52,7 +52,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                 Collection<GrantedAuthority> authorities = Collections.singletonList(authority);
 
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        user.getUserId(), null, authorities);
+                        user.getId(), null, authorities);
 
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -75,7 +75,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             UsernamePasswordAuthenticationToken newAuthentication = new UsernamePasswordAuthenticationToken(
                     userRepository.findByEmail(userEmail).orElseThrow(
                                     () -> new UsernameNotFoundException("User not found during refresh: " + userEmail))
-                            .getUserId(), null, Collections.emptyList());
+                            .getId(), null, Collections.emptyList());
             SecurityContextHolder.getContext().setAuthentication(newAuthentication);
         } else {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized: Token expired or invalid. Please log in again.");

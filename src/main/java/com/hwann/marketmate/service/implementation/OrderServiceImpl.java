@@ -33,14 +33,14 @@ public class OrderServiceImpl implements OrderService {
         order.setUser(user);
         order.setStatus(OrderStatus.PENDING);
         order.setOrderDate(LocalDateTime.now());
-        order.setOrderItems(new HashSet<>());
+        order.setOrderDetails(new HashSet<>());
 
         for (CartItem cartItem : cartItems) {
-            OrderDetail orderItem = new OrderDetail();
-            orderItem.setProduct(cartItem.getProduct());
-            orderItem.setQuantity(cartItem.getQuantity());
-            orderItem.setOrder(order);
-            order.getOrderItems().add(orderItem);
+            OrderDetail orderDetail = new OrderDetail();
+            orderDetail.setProduct(cartItem.getProduct());
+            orderDetail.setQuantity(cartItem.getQuantity());
+            orderDetail.setOrder(order);
+            order.getOrderDetails().add(orderDetail);
         }
 
         orderRepository.save(order);
@@ -55,7 +55,7 @@ public class OrderServiceImpl implements OrderService {
         updateOrderStatus(order);
 
         OrderDto orderDto = new OrderDto();
-        orderDto.setUserId(order.getUser().getUserId());
+        orderDto.setUserId(order.getUser().getId());
         // 주문 상품 목록을 OrderItemDto로 변환하여 설정하는 로직을 추가합니다.
 
         return orderDto;
@@ -71,7 +71,7 @@ public class OrderServiceImpl implements OrderService {
         if (order.getStatus() == OrderStatus.PENDING) {
             order.setStatus(OrderStatus.CANCELED);
 
-            order.getOrderItems().forEach(item -> {
+            order.getOrderDetails().forEach(item -> {
                 Product product = item.getProduct();
                 product.setStock(product.getStock() + item.getQuantity());
                 productRepository.save(product);
@@ -93,7 +93,7 @@ public class OrderServiceImpl implements OrderService {
         if (order.getStatus() == OrderStatus.COMPLETED) {
             order.setStatus(OrderStatus.RETURNED);
 
-            order.getOrderItems().forEach(item -> {
+            order.getOrderDetails().forEach(item -> {
                 Product product = item.getProduct();
                 product.setStock(product.getStock() + item.getQuantity());
                 productRepository.save(product);

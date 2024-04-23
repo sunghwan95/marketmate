@@ -6,5 +6,4 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CartItemRepository extends JpaRepository<CartItem, Long> {
-    // 추가적인 메서드가 필요한 경우 여기에 작성할 수 있습니다.
 }

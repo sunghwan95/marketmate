@@ -12,13 +12,13 @@ import lombok.*;
 public class WishlistItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long wishlistItemId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "wishlistId")
+    @JoinColumn(name = "wishlist_id")
     private Wishlist wishlist;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "productId")
+    @JoinColumn(name = "product_id")
     private Product product;
 }

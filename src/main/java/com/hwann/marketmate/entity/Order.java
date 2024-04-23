@@ -16,14 +16,14 @@ import java.util.Set;
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
+    @JoinColumn(name = "user_id")
     private User user;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<OrderDetail> orderItems = new HashSet<>();
+    private Set<OrderDetail> orderDetails = new HashSet<>();
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;

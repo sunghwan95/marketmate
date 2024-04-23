@@ -3,14 +3,12 @@ package com.hwann.marketmate.service.implementation;
 import com.hwann.marketmate.entity.User;
 import com.hwann.marketmate.repository.UserRepository;
 import com.hwann.marketmate.service.EmailService;
-import com.hwann.marketmate.service.UserService;
 import com.hwann.marketmate.util.CryptoUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,20 +22,19 @@ import java.util.concurrent.TimeUnit;
 public class EmailServiceImpl implements EmailService {
     private final JavaMailSender mailSender;
     private final UserRepository userRepository;
-    private final UserService userService;
     private final CryptoUtil cryptoUtil;
     private final StringRedisTemplate redisTemplate;
 
     @Override
-    public String sendVerificationCode(Authentication authentication) throws Exception {
-        User user = userService.identifyUser(authentication);
-
+    public String sendVerificationCode(User user) throws Exception {
         String userEmail = user.getEmail();
         String verificationCode = generateVerificationCode();
+
         SimpleMailMessage message = new SimpleMailMessage();
         message.setTo(cryptoUtil.decrypt(user.getEmail()));
         message.setSubject("Verification Code");
         message.setText("Your verification code is: " + verificationCode);
+
         mailSender.send(message);
 
         saveVerificationCode(userEmail, verificationCode);
@@ -55,9 +52,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    public Map<String, Boolean> verifyEmail(String code, Authentication authentication) {
-        User user = userService.identifyUser(authentication);
-
+    public Map<String, Boolean> verifyEmail(String code, User user) {
         String userEmail = user.getEmail();
         String savedCode = redisTemplate.opsForValue().get(userEmail);
 

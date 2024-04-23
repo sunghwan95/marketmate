@@ -1,6 +1,8 @@
 package com.hwann.marketmate.controller;
 
 import com.hwann.marketmate.dto.WishlistItemDto;
+import com.hwann.marketmate.entity.User;
+import com.hwann.marketmate.service.UserService;
 import com.hwann.marketmate.service.WishlistCartFacade;
 import com.hwann.marketmate.service.WishlistService;
 import com.hwann.marketmate.service.implementation.WishlistCartFacadeImpl;
@@ -15,19 +17,22 @@ import java.util.Set;
 @RequiredArgsConstructor
 @RequestMapping("/wishlist")
 public class WishlistController {
+    private final UserService userService;
     private final WishlistService wishlistService;
     private final WishlistCartFacade wishlistCartFacade;
 
     @GetMapping
     public ResponseEntity<Set<WishlistItemDto>> getWishlist(
             Authentication authentication) {
-        Set<WishlistItemDto> wishlistItems = wishlistService.getWishlistItemsForUser(authentication);
+        User user = userService.identifyUser(authentication);
+        Set<WishlistItemDto> wishlistItems = wishlistService.getWishlistItemsForUser(user);
         return ResponseEntity.ok(wishlistItems);
     }
 
     @PostMapping("/add")
     public ResponseEntity<?> addToWishlist(@RequestBody WishlistItemDto wishlistItemDto, Authentication authentication) {
-        wishlistService.addItemToWishlist(wishlistItemDto, authentication);
+        User user = userService.identifyUser(authentication);
+        wishlistService.addItemToWishlist(wishlistItemDto, user);
         return ResponseEntity.ok().build();
     }
 
@@ -39,7 +44,8 @@ public class WishlistController {
 
     @PostMapping("/add-to-cart/{wishlistItemId}")
     public ResponseEntity<?> addToCart(@PathVariable("wishlistItemId") Long wishlistItemId, Authentication authentication) {
-        wishlistCartFacade.transferItemToCart(authentication, wishlistItemId);
+        User user = userService.identifyUser(authentication);
+        wishlistCartFacade.transferItemToCart(user, wishlistItemId);
         return ResponseEntity.ok().build();
     }
 }

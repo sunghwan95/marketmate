@@ -1,18 +1,17 @@
 package com.hwann.marketmate.service.implementation;
 
-import com.hwann.marketmate.entity.Cart;
-import com.hwann.marketmate.entity.CartItem;
-import com.hwann.marketmate.entity.Product;
-import com.hwann.marketmate.entity.User;
+import com.hwann.marketmate.dto.CartItemDto;
+import com.hwann.marketmate.entity.*;
 import com.hwann.marketmate.repository.CartItemRepository;
 import com.hwann.marketmate.repository.CartRepository;
 import com.hwann.marketmate.service.CartService;
-import com.hwann.marketmate.service.OrderService;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -20,12 +19,25 @@ import java.util.List;
 public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
-    private final OrderService orderService;
+
+    @Override
+    public Set<CartItemDto> getCartItemsForUser(User user) {
+        Cart cart = cartRepository.findById(user.getId())
+                .orElseThrow(() -> new EntityNotFoundException("Wishlist not found for user"));
+
+        return cart.getItems().stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toSet());
+    }
 
     @Override
     public void addItemToCart(User user, Product product) {
-        Cart cart = cartRepository.findByUserId(user.getUserId())
-                .orElseGet(() -> Cart.builder().user(user).build());
+        Cart cart = cartRepository.findById(user.getId())
+                .orElseGet(() -> {
+                    Cart newCart = Cart.builder().user(user).build();
+                    cartRepository.save(newCart); // 새로 생성된 카트를 저장
+                    return newCart;
+                });
 
         CartItem cartItem = CartItem.builder()
                 .cart(cart)
@@ -33,8 +45,7 @@ public class CartServiceImpl implements CartService {
                 .quantity(1)
                 .build();
 
-        cart.getItems().add(cartItem);
-        cartItemRepository.save(cartItem);
+        cartItemRepository.save(cartItem); // 카트 아이템 저장
     }
 
     @Override
@@ -48,5 +59,14 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
         cartItem.setQuantity(quantity);
         cartItemRepository.save(cartItem);
+    }
+
+    private CartItemDto convertToDto(CartItem item) {
+
+        CartItemDto dto = new CartItemDto();
+        dto.setProductId(item.getProduct().getId());
+        dto.setQuantity(item.getQuantity());
+
+        return dto;
     }
 }

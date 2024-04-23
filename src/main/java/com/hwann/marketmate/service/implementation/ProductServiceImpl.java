@@ -16,7 +16,7 @@ import java.util.List;
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
-    private Product registerProduct(ProductRegistrationDto productRegistrationDto) {
+    public Product registerProduct(ProductRegistrationDto productRegistrationDto) {
         Product product = Product.builder()
                 .name(productRegistrationDto.getName())
                 .price(productRegistrationDto.getPrice())
@@ -27,11 +27,11 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.save(product);
     }
 
-    private List<Product> getAllProducts() {
+    public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
-    private Product getProductById(Long productId) {
+    public Product getProductById(Long productId) {
         return productRepository.findById(productId).orElse(null);
     }
 }

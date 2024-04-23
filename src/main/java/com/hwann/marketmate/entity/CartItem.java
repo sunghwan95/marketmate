@@ -12,14 +12,14 @@ import lombok.*;
 public class CartItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long cartItemId;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cartId")
+    @JoinColumn(name = "cart_id")
     private Cart cart;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "productId")
+    @JoinColumn(name = "product_id")
     private Product product;
 
     private int quantity;

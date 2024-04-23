@@ -1,13 +1,11 @@
 package com.hwann.marketmate.service;
 
-import com.hwann.marketmate.dto.UpdateUserInfoDto;
-import com.hwann.marketmate.dto.UserRegistrationDto;
-import com.hwann.marketmate.dto.LoginDto;
-import com.hwann.marketmate.dto.WishlistItemDto;
+import com.hwann.marketmate.dto.*;
 import com.hwann.marketmate.entity.User;
 import org.springframework.security.core.Authentication;
 
 import java.util.List;
+import java.util.Set;
 
 public interface UserService {
     void register(UserRegistrationDto userRegistrationDto) throws Exception;
@@ -16,7 +14,11 @@ public interface UserService {
 
     void logout(String accessToken);
 
-    void updateUserDetails(Long userId, UpdateUserInfoDto updateUserInfoDtd, Authentication authentication) throws Exception;
+    UserDetailsDto getUserDetails(Long userId);
+
+    void updateUserDetails(User user, UpdateUserInfoDto updateUserInfoDto);
 
     User identifyUser(Authentication authentication);
+
+    User identifyUserById(Long userId);
 }
