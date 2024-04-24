@@ -63,7 +63,6 @@ public class EmailServiceImpl implements EmailService {
     }
 
     @Override
-    @Transactional
     public void updateEmailVerifiedStatus(String email, boolean isVerified) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));

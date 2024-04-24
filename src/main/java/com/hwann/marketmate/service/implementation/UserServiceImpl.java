@@ -19,7 +19,6 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@Transactional
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
@@ -54,10 +53,10 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         if (passwordEncoder.matches(loginDto.password, user.getPassword())) {
-            String accessToken = jwtTokenUtil.generateAccessToken(userEmail);
-            String refreshToken = jwtTokenUtil.generateRefreshToken(userEmail);
+            String accessToken = jwtTokenUtil.generateAccessToken(user.getEmail());
+            String refreshToken = jwtTokenUtil.generateRefreshToken(user.getEmail());
 
-            stringRedisTemplate.opsForValue().set(cryptoUtil.encrypt(userEmail), refreshToken, 30, TimeUnit.DAYS);
+            stringRedisTemplate.opsForValue().set(user.getEmail(), refreshToken, 30, TimeUnit.DAYS);
 
             accessToken = "Bearer " + accessToken;
             return accessToken;

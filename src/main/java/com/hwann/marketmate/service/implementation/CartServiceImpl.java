@@ -10,6 +10,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -32,20 +34,33 @@ public class CartServiceImpl implements CartService {
 
     @Override
     public void addItemToCart(User user, Product product) {
-        Cart cart = cartRepository.findById(user.getId())
+        // 유저의 카트를 조회하거나 없을 경우 새로 생성합니다.
+        Cart cart = cartRepository.findByUser(user)
                 .orElseGet(() -> {
-                    Cart newCart = Cart.builder().user(user).build();
-                    cartRepository.save(newCart); // 새로 생성된 카트를 저장
+                    Cart newCart = Cart.builder()
+                            .user(user)
+                            .items(new HashSet<>())
+                            .build();
+                    cartRepository.save(newCart);
                     return newCart;
                 });
 
-        CartItem cartItem = CartItem.builder()
-                .cart(cart)
-                .product(product)
-                .quantity(1)
-                .build();
+        Optional<CartItem> existingCartItem = cart.getItems().stream()
+                .filter(item -> item.getProduct().getId().equals(product.getId()))
+                .findFirst();
 
-        cartItemRepository.save(cartItem); // 카트 아이템 저장
+        if (existingCartItem.isPresent()) {
+            CartItem cartItem = existingCartItem.get();
+            cartItem.setQuantity(cartItem.getQuantity() + 1);
+            cartItemRepository.save(cartItem);
+        } else {
+            CartItem newCartItem = CartItem.builder()
+                    .cart(cart)
+                    .product(product)
+                    .quantity(1)
+                    .build();
+            cartItemRepository.save(newCartItem);
+        }
     }
 
     @Override

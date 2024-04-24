@@ -14,8 +14,8 @@ public class WishlistCartFacadeImpl implements WishlistCartFacade {
     private final CartServiceImpl cartService;
 
     @Override
-    @Transactional
     public void transferItemToCart(User user, Long wishlistItemId) {
+        System.out.println("찜물품 아이디" + wishlistItemId);
         WishlistItem wishlistItem = wishlistService.findWishlistItemById(wishlistItemId)
                 .orElseThrow(() -> new IllegalStateException("Wishlist item not found"));
 

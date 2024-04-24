@@ -12,5 +12,10 @@ public interface WishlistService {
     Set<WishlistItemDto> getWishlistItemsForUser(User user);
     void addItemToWishlist(WishlistItemDto wishlistItemDto, User user);
     void removeItemFromWishlist(Long wishlistItemId);
+
+    void deleteWishlist(User user);
+
     Optional<WishlistItem> findWishlistItemById(Long wishlistItemId);
+
+    boolean isWishlistEmpty(User user);
 }

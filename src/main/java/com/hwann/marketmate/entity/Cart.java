@@ -3,6 +3,7 @@ package com.hwann.marketmate.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Entity(name = "carts")
@@ -21,5 +22,16 @@ public class Cart {
     private User user;
 
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<CartItem> items;
+    private Set<CartItem> items = new HashSet<>();
+
+    public static class CartBuilder {
+        public CartBuilder items(Set<CartItem> items) {
+            if (items == null) {
+                this.items = new HashSet<>();
+            } else {
+                this.items = new HashSet<>(items);
+            }
+            return this;
+        }
+    }
 }

@@ -6,6 +6,7 @@ import com.hwann.marketmate.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -20,7 +21,7 @@ public class EmailController {
     private UserService userService;
     private EmailService emailService;
 
-    // 이메일 인증 코드 발송
+    //pass
     @PostMapping("/auth/send-verification")
     public ResponseEntity<String> sendVerificationCode(Authentication authentication) throws Exception {
         User user = userService.identifyUser(authentication);
@@ -28,8 +29,9 @@ public class EmailController {
         return ResponseEntity.ok("Verification code sent to " + userEmail);
     }
 
-    // 이메일 인증 확인
+    //pass
     @PostMapping("/auth/verify-email")
+    @Transactional
     public ResponseEntity<String> verifyEmail(@RequestParam(name = "code") String code, Authentication authentication) throws Exception {
         User user = userService.identifyUser(authentication);
 
