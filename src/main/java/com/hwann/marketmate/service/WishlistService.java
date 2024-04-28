@@ -1,21 +1,25 @@
 package com.hwann.marketmate.service;
 
 import com.hwann.marketmate.dto.WishlistItemDto;
+import com.hwann.marketmate.entity.Product;
 import com.hwann.marketmate.entity.User;
-import com.hwann.marketmate.entity.WishlistItem;
-import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 import java.util.Set;
 
 public interface WishlistService {
     Set<WishlistItemDto> getWishlistItemsForUser(User user);
-    void addItemToWishlist(WishlistItemDto wishlistItemDto, User user);
-    void removeItemFromWishlist(Long wishlistItemId);
+
+    void addItemToWishlist(User user, Long productId);
+
+    void removeItemFromWishlist(User user, Long productId);
 
     void deleteWishlist(User user);
 
-    Optional<WishlistItem> findWishlistItemById(Long wishlistItemId);
+    Optional<Product> findWishlistItemById(Long wishlistId, Long productId);
 
     boolean isWishlistEmpty(User user);
+
+    Optional<Product> findProductById(Long productId);
 }

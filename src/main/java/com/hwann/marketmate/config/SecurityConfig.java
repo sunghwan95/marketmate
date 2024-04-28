@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("/users/register", "/users/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/products").hasAnyAuthority("ROLE_SELLER", "ROLE_ADMIN")
+                        .requestMatchers("/cart/**").hasAnyAuthority("ROLE_SELLER", "ROLE_ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

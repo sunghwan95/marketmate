@@ -3,6 +3,8 @@ package com.hwann.marketmate.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.Set;
+
 @Entity(name = "products")
 @Getter
 @Setter
@@ -12,7 +14,7 @@ import lombok.*;
 public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long productId;
 
     @Column(nullable = false)
     private String name;
@@ -25,4 +27,15 @@ public class Product {
 
     @Column(nullable = false)
     private int stock;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cart_id", referencedColumnName = "cartId")
+    private Cart cart;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "wishlist_id", referencedColumnName = "wishlistId")
+    private Wishlist wishlist;
+
+    @OneToOne(mappedBy = "product", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private OrderDetail orderDetail;
 }

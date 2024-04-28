@@ -1,35 +1,50 @@
 version: "3"
 services:
-  databases1:
-    image: mysql:latest
-    container_name: mysql_marketmate
-    hostname: localhost
+  marketmate:
+    container_name: marketmate
+    build: .
+    image: marketmate
     ports:
-      - "3307:3306"
-    extra_hosts:
-      - host.docker.internal:host-gateway
-    volumes:
-      - ./mysql/data:/var/lib/mysql
+      - "8080:8080"
+    depends_on:
+      - mysql
+      - redis
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/marketmate?serverTimezone=Asia/Seoul&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=tjdghks9471
+      - SPRING_REDIS_HOST=redis
+      - SPRING_REDIS_PORT=6379
+    restart: always
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "mysql" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - network
+
+  mysql:
+    image: mysql:latest
+    container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: tjdghks9471
-      MYSQL_DATABASE: marketmate
-      MYSQL_USER: sunghwan
-      MYSQL_PASSWORD: tjdghks9471
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./mysql/data:/var/lib/mysql
     restart: always
     networks:
-      - app-tier
+      - network
 
-  database2:
+  redis:
     image: redis:latest
     container_name: marketmate-redis
-    hostname: localhost
     ports:
       - "6379:6379"
-    extra_hosts:
-      - host.docker.internal:host-gateway
     networks:
-      - app-tier
+      - network
 
 networks:
-  app-tier:
+  network:
     driver: bridge

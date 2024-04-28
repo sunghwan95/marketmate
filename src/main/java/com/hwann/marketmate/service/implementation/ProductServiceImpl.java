@@ -6,14 +6,18 @@ import com.hwann.marketmate.repository.ProductRepository;
 import com.hwann.marketmate.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
 
+    @Override
+    @Transactional
     public Product registerProduct(ProductRegistrationDto productRegistrationDto) {
         Product product = Product.builder()
                 .name(productRegistrationDto.getName())
@@ -25,11 +29,14 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.save(product);
     }
 
+    @Override
+    @Transactional
     public List<Product> getAllProducts() {
         return productRepository.findAll();
     }
 
-    public Product getProductById(Long productId) {
-        return productRepository.findById(productId).orElse(null);
+    @Override
+    public Optional<Product> getProductById(Long productId) {
+        return productRepository.findById(productId);
     }
 }

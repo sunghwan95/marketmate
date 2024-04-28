@@ -10,7 +10,7 @@ public interface OrderService {
 
     void returnOrder(Long orderId) throws Exception;
 
-    void createOrderFromCartItems(User user, List<Long> cartItemIds);
+    void createOrderFromCartItems(User user, Long cartItemId);
 
     OrderDto getOrderStatus(Long orderId) throws Exception;
 }

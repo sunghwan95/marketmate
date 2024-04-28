@@ -6,19 +6,17 @@ import com.hwann.marketmate.service.ProductService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/products")
-@Transactional
 public class ProductController {
     private final ProductService productService;
 
-    //pass
     @PostMapping
     public ResponseEntity<?> registerProduct(@RequestBody ProductRegistrationDto productRegistrationDto) {
         try {
@@ -29,18 +27,16 @@ public class ProductController {
         }
     }
 
-    //pass
     @GetMapping
     public ResponseEntity<List<Product>> getAllProducts() {
         List<Product> products = productService.getAllProducts();
         return ResponseEntity.ok(products);
     }
 
-    //pass
     @GetMapping("/{id}")
     public ResponseEntity<?> getProductDetails(@PathVariable("id") Long id) {
-        Product product = productService.getProductById(id);
-        if (product != null) {
+        Optional<Product> product = productService.getProductById(id);
+        if (product.isPresent()) {
             return ResponseEntity.ok(product);
         } else {
             return ResponseEntity.ok().body("존재하지 않는 상품입니다.");

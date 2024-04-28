@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -18,56 +17,57 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class WishlistServiceImpl implements WishlistService {
     private final WishlistRepository wishlistRepository;
-    private final WishlistItemRepository wishlistItemRepository;
     private final ProductServiceImpl productService;
 
     @Override
+    @Transactional
     public Set<WishlistItemDto> getWishlistItemsForUser(User user) {
-        Wishlist wishlist = wishlistRepository.findById(user.getId())
+        Wishlist wishlist = wishlistRepository.findById(user.getUserId())
                 .orElseThrow(() -> new EntityNotFoundException("Wishlist not found for user"));
 
-        return wishlist.getItems().stream()
+        return wishlist.getProducts().stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public void addItemToWishlist(WishlistItemDto wishlistItemDto, User user) {
-        Product product = productService.getProductById(wishlistItemDto.getProductId());
+    @Transactional
+    public void addItemToWishlist(User user, Long productId) {
+        Product product = productService.getProductById(productId)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found")); // Product가 없는 경우 예외 처리
 
         Wishlist wishlist = wishlistRepository.findByUser(user)
                 .orElseGet(() -> {
                     Wishlist newWishlist = Wishlist.builder()
                             .user(user)
-                            .items(new HashSet<>())
                             .build();
-                    wishlistRepository.save(newWishlist);
-                    return newWishlist;
+                    return wishlistRepository.save(newWishlist);
                 });
 
-        Optional<WishlistItem> existingWishlistItem = wishlist.getItems().stream()
-                .filter(item -> item.getProduct().getId().equals(product.getId()))
-                .findFirst();
-
-        if (existingWishlistItem.isPresent()) {
-            throw new IllegalStateException("이미 찜한 물품입니다.");
+        if (!wishlist.getProducts().contains(product)) {
+            wishlist.getProducts().add(product);
+            wishlistRepository.save(wishlist);
         } else {
-            WishlistItem newWishlistItem = WishlistItem.builder()
-                    .wishlist(wishlist)
-                    .product(product)
-                    .build();
-            wishlistItemRepository.save(newWishlistItem); // 새 위시리스트 아이템 저장
-            wishlist.getItems().add(newWishlistItem); // 컬렉션에도 추가
-            System.out.println("찜물품들 :" + wishlist.getItems());
+            throw new IllegalStateException("Product already in wishlist");
         }
     }
 
-    @Override
-    public void removeItemFromWishlist(Long wishlistItemId) {
-        wishlistItemRepository.deleteById(wishlistItemId);
-    }
 
     @Override
+    @Transactional
+    public void removeItemFromWishlist(User user, Long productId) {
+        Wishlist wishlist = wishlistRepository.findByUser(user)
+                .orElseThrow(() -> new IllegalStateException("Wishlist not found"));
+        Product product = productService.getProductById(productId)
+                .orElseThrow(() -> new IllegalStateException("Product not found in wishlist"));
+
+        wishlist.getProducts().remove(product);
+        wishlistRepository.save(wishlist);
+    }
+
+
+    @Override
+    @Transactional
     public void deleteWishlist(User user) {
         Wishlist wishlist = wishlistRepository.findByUser(user)
                 .orElseThrow(() -> new RuntimeException("Wishlist not found for user"));
@@ -76,20 +76,29 @@ public class WishlistServiceImpl implements WishlistService {
     }
 
     @Override
-    public Optional<WishlistItem> findWishlistItemById(Long wishlistItemId) {
-        Optional<WishlistItem> item = wishlistItemRepository.findById(wishlistItemId);
-        System.out.println("아이템 : " + item);
-        return item;
+    @Transactional
+    public Optional<Product> findWishlistItemById(Long wishlistId, Long productId) {
+        Optional<Wishlist> wishlist = wishlistRepository.findById(wishlistId);
+        return wishlist.flatMap(value -> value.getProducts().stream()
+                .filter(product -> product.getProductId().equals(productId))
+                .findFirst());
     }
 
     @Override
+    @Transactional
     public boolean isWishlistEmpty(User user) {
         Wishlist wishlist = wishlistRepository.findByUser(user)
                 .orElseThrow(() -> new IllegalStateException("Wishlist not found for user"));
-        return wishlist.getItems().isEmpty();
+        return wishlist.getProducts().isEmpty();
     }
 
-    private WishlistItemDto convertToDto(WishlistItem item) {
-        return new WishlistItemDto(item.getProduct().getId(), item.getProduct().getName());
+    @Override
+    @Transactional
+    public Optional<Product> findProductById(Long productId) {
+        return productService.getProductById(productId);
+    }
+
+    private WishlistItemDto convertToDto(Product product) {
+        return new WishlistItemDto(product.getProductId(), product.getName());
     }
 }

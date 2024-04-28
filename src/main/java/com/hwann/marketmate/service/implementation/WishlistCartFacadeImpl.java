@@ -1,7 +1,7 @@
 package com.hwann.marketmate.service.implementation;
 
+import com.hwann.marketmate.entity.Product;
 import com.hwann.marketmate.entity.User;
-import com.hwann.marketmate.entity.WishlistItem;
 import com.hwann.marketmate.service.WishlistCartFacade;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,12 +14,13 @@ public class WishlistCartFacadeImpl implements WishlistCartFacade {
     private final CartServiceImpl cartService;
 
     @Override
-    public void transferItemToCart(User user, Long wishlistItemId) {
-        System.out.println("찜물품 아이디" + wishlistItemId);
-        WishlistItem wishlistItem = wishlistService.findWishlistItemById(wishlistItemId)
+    @Transactional
+    public void transferItemToCart(User user, Long productId) {
+        // 아이템을 찾아 카트로 이동
+        Product product = wishlistService.findProductById(productId)
                 .orElseThrow(() -> new IllegalStateException("Wishlist item not found"));
 
-        cartService.addItemToCart(user, wishlistItem.getProduct());
-        wishlistService.removeItemFromWishlist(wishlistItemId);
+        cartService.addItemToCart(user, product);
+        wishlistService.removeItemFromWishlist(user, productId);
     }
 }

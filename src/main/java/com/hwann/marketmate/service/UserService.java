@@ -19,6 +19,4 @@ public interface UserService {
     void updateUserDetails(User user, UpdateUserInfoDto updateUserInfoDto);
 
     User identifyUser(Authentication authentication);
-
-    User identifyUserById(Long userId);
 }

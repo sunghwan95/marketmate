@@ -2,9 +2,9 @@ package com.hwann.marketmate.controller;
 
 import com.hwann.marketmate.dto.WishlistItemDto;
 import com.hwann.marketmate.entity.User;
-import com.hwann.marketmate.service.UserService;
-import com.hwann.marketmate.service.WishlistService;
+import com.hwann.marketmate.service.implementation.UserServiceImpl;
 import com.hwann.marketmate.service.implementation.WishlistCartFacadeImpl;
+import com.hwann.marketmate.service.implementation.WishlistServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -18,11 +18,10 @@ import java.util.Set;
 @RequiredArgsConstructor
 @RequestMapping("/wishlist")
 public class WishlistController {
-    private final UserService userService;
-    private final WishlistService wishlistService;
+    private final UserServiceImpl userService;
+    private final WishlistServiceImpl wishlistService;
     private final WishlistCartFacadeImpl wishlistCartFacade;
 
-    //pass
     @GetMapping
     public ResponseEntity<Set<WishlistItemDto>> getWishlist(
             Authentication authentication) {
@@ -31,26 +30,22 @@ public class WishlistController {
         return ResponseEntity.ok(wishlistItems);
     }
 
-    //pass
     @PostMapping("/add")
-    @Transactional
     public ResponseEntity<?> addToWishlist(@RequestBody WishlistItemDto wishlistItemDto, Authentication authentication) {
         User user = userService.identifyUser(authentication);
-        wishlistService.addItemToWishlist(wishlistItemDto, user);
+        wishlistService.addItemToWishlist(user, wishlistItemDto.getProductId());
         return ResponseEntity.ok().build();
     }
 
-    //pass
     @DeleteMapping("/remove/{wishlistItemId}")
     @Transactional
-    public ResponseEntity<?> removeFromWishlist(@PathVariable("wishlistItemId") Long wishlistItemId) {
-        wishlistService.removeItemFromWishlist(wishlistItemId);
+    public ResponseEntity<?> removeFromWishlist(@PathVariable("wishlistItemId") Long wishlistItemId, Authentication authentication) {
+        User user = userService.identifyUser(authentication);
+        wishlistService.removeItemFromWishlist(user, wishlistItemId);
         return ResponseEntity.ok().build();
     }
 
-    //pass
     @PostMapping("/add-to-cart")
-    @Transactional
     public ResponseEntity<?> addToCart(@RequestParam("wishlistItemIds") List<Long> wishlistItemIds, Authentication authentication) {
         User user = userService.identifyUser(authentication);
         wishlistItemIds.forEach(id -> wishlistCartFacade.transferItemToCart(user, id));

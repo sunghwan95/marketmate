@@ -1,64 +1,69 @@
 package com.hwann.marketmate.controller;
 
 import com.hwann.marketmate.dto.CartItemDto;
-import com.hwann.marketmate.dto.WishlistItemDto;
+import com.hwann.marketmate.entity.CartItem;
 import com.hwann.marketmate.entity.Product;
 import com.hwann.marketmate.entity.User;
-import com.hwann.marketmate.service.CartOrderFacade;
-import com.hwann.marketmate.service.CartService;
-import com.hwann.marketmate.service.ProductService;
-import com.hwann.marketmate.service.UserService;
+import com.hwann.marketmate.service.implementation.CartOrderFacadeImpl;
+import com.hwann.marketmate.service.implementation.CartServiceImpl;
+import com.hwann.marketmate.service.implementation.ProductServiceImpl;
+import com.hwann.marketmate.service.implementation.UserServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/cart")
 public class CartController {
-    private final CartService cartService;
-    private final UserService userService;
-    private final ProductService productService;
-    private final CartOrderFacade cartOrderFacade;
+    private final UserServiceImpl userService;
+    private final CartServiceImpl cartService;
+    private final ProductServiceImpl productService;
+    private final CartOrderFacadeImpl cartOrderFacade;
 
     @GetMapping
-    public ResponseEntity<Set<CartItemDto>> getWishlist(
+    public ResponseEntity<Set<CartItem>> getCartItems(
             Authentication authentication) {
         User user = userService.identifyUser(authentication);
-        Set<CartItemDto> wishlistItems = cartService.getCartItemsForUser(user);
-        return ResponseEntity.ok(wishlistItems);
+        Set<CartItem> cartItems = cartService.getCartItemsForUser(user);
+        return ResponseEntity.ok(cartItems);
     }
 
-    @PostMapping("/add")
+    @PostMapping
     public ResponseEntity<?> addItemToCart(@RequestBody CartItemDto cartItemDto, Authentication authentication) {
         User user = userService.identifyUser(authentication);
-        Product product = productService.getProductById(cartItemDto.getProductId());
+        Optional<Product> productOptional = productService.getProductById(cartItemDto.getProductId());
 
+        if (productOptional.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Product product = productOptional.get();
         cartService.addItemToCart(user, product);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping("/remove/{cartItemId}")
+    @DeleteMapping("/{cartItemId}")
     public ResponseEntity<?> removeItemFromCart(@PathVariable("cartItemId") Long cartItemId) {
         cartService.removeItemFromCart(cartItemId);
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/update/{cartItemId}")
-    public ResponseEntity<?> updateCartItemQuantity(@PathVariable("cartItemId") Long cartItemId, @RequestParam int quantity) {
+    @PatchMapping("/{cartItemId}")
+    public ResponseEntity<?> updateCartItemQuantity(@PathVariable("cartItemId") Long cartItemId, @RequestParam("quantity") int quantity) {
         cartService.updateCartItemQuantity(cartItemId, quantity);
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/deliver/selected")
-    public ResponseEntity<?> checkoutSelectedItems(@RequestBody List<Long> cartItemIds, Authentication authentication) {
+    @PostMapping("/selected-order")
+    public ResponseEntity<?> checkoutSelectedItems(@RequestParam("cartItemIds") List<Long> cartItemIds, Authentication authentication) {
         User user = userService.identifyUser(authentication);
-
-        cartOrderFacade.moveItemsToOrderService(user, cartItemIds);
+        cartItemIds.forEach(id -> cartOrderFacade.moveItemsToOrderService(user, id));
         return ResponseEntity.ok().build();
     }
 }

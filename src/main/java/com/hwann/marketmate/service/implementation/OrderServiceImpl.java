@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
-import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -23,9 +23,9 @@ public class OrderServiceImpl implements OrderService {
     private final CartItemRepository cartItemRepository;
 
     @Override
-    public void createOrderFromCartItems(User user, List<Long> cartItemIds) {
-        List<CartItem> cartItems = cartItemRepository.findAllById(cartItemIds);
-        if (cartItems.isEmpty()) {
+    public void createOrderFromCartItems(User user, Long cartItemId) {
+        Optional<CartItem> cartItem = cartItemRepository.findById(cartItemId);
+        if (cartItem.isEmpty()) {
             throw new IllegalArgumentException("No cart items found for given IDs");
         }
 
@@ -35,16 +35,16 @@ public class OrderServiceImpl implements OrderService {
         order.setOrderDate(LocalDateTime.now());
         order.setOrderDetails(new HashSet<>());
 
-        for (CartItem cartItem : cartItems) {
-            OrderDetail orderDetail = new OrderDetail();
-            orderDetail.setProduct(cartItem.getProduct());
-            orderDetail.setQuantity(cartItem.getQuantity());
-            orderDetail.setOrder(order);
-            order.getOrderDetails().add(orderDetail);
-        }
+
+        OrderDetail orderDetail = new OrderDetail();
+        orderDetail.setProduct(cartItem.get().getProduct());
+        orderDetail.setQuantity(cartItem.get().getQuantity());
+        orderDetail.setOrder(order);
+        order.getOrderDetails().add(orderDetail);
+
 
         orderRepository.save(order);
-        cartItemRepository.deleteAll(cartItems);
+        cartItemRepository.deleteById(cartItemId);
     }
 
     @Override
@@ -55,8 +55,7 @@ public class OrderServiceImpl implements OrderService {
         updateOrderStatus(order);
 
         OrderDto orderDto = new OrderDto();
-        orderDto.setUserId(order.getUser().getId());
-        // 주문 상품 목록을 OrderItemDto로 변환하여 설정하는 로직을 추가합니다.
+        orderDto.setUserId(order.getUser().getUserId());
 
         return orderDto;
     }

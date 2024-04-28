@@ -10,7 +10,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +27,7 @@ public class UserServiceImpl implements UserService {
     private final RedisTemplate<String, String> stringRedisTemplate;
 
     @Override
+    @Transactional
     public void register(UserRegistrationDto userRegistrationDto) throws Exception {
         if (userRepository.findByEmail(cryptoUtil.encrypt(userRegistrationDto.getEmail())).isPresent()) {
             throw new Exception("이미 존재하는 이메일입니다");
@@ -47,6 +47,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public String login(LoginDto loginDto) throws Exception {
         String userEmail = loginDto.email;
         User user = userRepository.findByEmail(cryptoUtil.encrypt(userEmail))
@@ -66,6 +67,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void logout(String accessToken) {
         try {
             String userEmail = jwtTokenUtil.getEmailFromToken(accessToken.replace("Bearer ", ""));
@@ -79,14 +81,16 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDetailsDto getUserDetails(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return new UserDetailsDto(user.getId(), user.getUsername(), user.getEmail());
+        return new UserDetailsDto(user.getUserId(), user.getUsername(), user.getEmail());
     }
 
     @Override
+    @Transactional
     public void updateUserDetails(User user, UpdateUserInfoDto updateUserInfoDto) {
 
         Optional.ofNullable(updateUserInfoDto.getAddress())
@@ -114,16 +118,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public User identifyUser(Authentication authentication) {
         Long userId = (Long) authentication.getPrincipal();
 
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
-    }
-
-    @Override
-    public User identifyUserById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 }

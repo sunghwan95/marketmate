@@ -18,18 +18,18 @@ public class Wishlist {
     private Long id;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "userId")
     private User user;
 
     @OneToMany(mappedBy = "wishlist", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<WishlistItem> items = new HashSet<>();
+    private Set<Product> products = new HashSet<>();
 
     public static class WishlistBuilder {
-        public Wishlist.WishlistBuilder items(Set<WishlistItem> items) {
-            if (items == null) {
-                this.items = new HashSet<>();
+        public Wishlist.WishlistBuilder products(Set<Product> products) {
+            if (products == null) {
+                this.products = new HashSet<>();
             } else {
-                this.items = new HashSet<>(items);
+                this.products = new HashSet<>(products);
             }
             return this;
         }

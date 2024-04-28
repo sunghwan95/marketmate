@@ -7,7 +7,7 @@ build/
 docker-compose.yaml
 mysql/data/
 /.env
-main/resources/application.properties
+./src/main/resources/application.properties
 
 ### STS ###
 .apt_generated

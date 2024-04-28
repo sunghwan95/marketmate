@@ -1,6 +1,5 @@
 package com.hwann.marketmate.service.implementation;
 
-import com.hwann.marketmate.dto.CartItemDto;
 import com.hwann.marketmate.entity.*;
 import com.hwann.marketmate.repository.CartItemRepository;
 import com.hwann.marketmate.repository.CartRepository;
@@ -13,7 +12,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -23,13 +21,11 @@ public class CartServiceImpl implements CartService {
     private final CartItemRepository cartItemRepository;
 
     @Override
-    public Set<CartItemDto> getCartItemsForUser(User user) {
-        Cart cart = cartRepository.findById(user.getId())
+    public Set<CartItem> getCartItemsForUser(User user) {
+        Cart cart = cartRepository.findByUser(user)
                 .orElseThrow(() -> new EntityNotFoundException("Wishlist not found for user"));
 
-        return cart.getItems().stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toSet());
+        return cart.getItems();
     }
 
     @Override
@@ -46,7 +42,7 @@ public class CartServiceImpl implements CartService {
                 });
 
         Optional<CartItem> existingCartItem = cart.getItems().stream()
-                .filter(item -> item.getProduct().getId().equals(product.getId()))
+                .filter(item -> item.getProduct().getProductId().equals(product.getProductId()))
                 .findFirst();
 
         if (existingCartItem.isPresent()) {
@@ -74,14 +70,5 @@ public class CartServiceImpl implements CartService {
                 .orElseThrow(() -> new IllegalArgumentException("Cart item not found"));
         cartItem.setQuantity(quantity);
         cartItemRepository.save(cartItem);
-    }
-
-    private CartItemDto convertToDto(CartItem item) {
-
-        CartItemDto dto = new CartItemDto();
-        dto.setProductId(item.getProduct().getId());
-        dto.setQuantity(item.getQuantity());
-
-        return dto;
     }
 }
