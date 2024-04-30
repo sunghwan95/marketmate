@@ -8,12 +8,6 @@ RUN apt-get update && apt-get install -y \
     unzip \
     && rm -rf /var/lib/apt/lists/*
 
-# Gradle 캐시 디렉토리 생성
-WORKDIR /home/gradle/.gradle
-
-# 호스트에서 캐시된 Gradle 데이터 복사
-COPY .gradle /home/gradle/.gradle
-
 # 애플리케이션 디렉토리 생성 및 설정
 WORKDIR /app
 

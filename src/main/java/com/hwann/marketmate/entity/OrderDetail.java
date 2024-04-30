@@ -14,17 +14,21 @@ import java.time.LocalDateTime;
 @IdClass(OrderDetailId.class)
 public class OrderDetail {
     @Id
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "product_id", referencedColumnName = "productId")
-    private Product product;
+    @Column(name = "product_id")
+    private Long productId;
 
     @Id
+    @Column(name = "order_id")
+    private Long orderId;
+
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", referencedColumnName = "orderId")
+    @JoinColumn(name = "product_id", referencedColumnName = "productId", insertable = false, updatable = false)
+    private Product product;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id", referencedColumnName = "orderId", insertable = false, updatable = false)
     private Order order;
 
     private int quantity;
     private LocalDateTime createdAt;
 }
-
-

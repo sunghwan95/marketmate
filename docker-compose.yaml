@@ -3,14 +3,14 @@ services:
   marketmate:
     container_name: marketmate
     build: .
-    image: marketmate
+    image: marketmate-image
     ports:
       - "8080:8080"
     depends_on:
       - mysql
       - redis
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/marketmate?serverTimezone=Asia/Seoul&useSSL=false
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/marketmate?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=tjdghks9471
       - SPRING_REDIS_HOST=redis

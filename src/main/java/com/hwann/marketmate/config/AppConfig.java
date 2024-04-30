@@ -39,9 +39,10 @@ public class AppConfig {
         Properties properties = new Properties();
         properties.setProperty("hibernate.hbm2ddl.auto", "update");
         properties.setProperty("hibernate.dialect", "org.hibernate.dialect.MySQL8Dialect");
-        properties.setProperty("hibernate.format_sql", "true");
+        properties.setProperty("hibernate.format_sql", String.valueOf(true));
         return properties;
     }
+
 
     @Bean
     public LettuceConnectionFactory redisConnectionFactory() {
