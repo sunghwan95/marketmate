@@ -1,9 +1,9 @@
 version: "3"
 services:
-  marketmate:
-    container_name: marketmate
-    build: .
-    image: marketmate-image
+  marketmate-userService:
+    container_name: marketmate-userService
+    build: ./user-service
+    image: userService-image
     ports:
       - "8080:8080"
     depends_on:

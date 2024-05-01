@@ -5,11 +5,31 @@ plugins {
     id 'io.spring.dependency-management' version '1.1.4'
 }
 
-group = 'com.hwann'
-version = '0.0.1-SNAPSHOT'
+repositories {
+    mavenCentral()
+}
 
-java {
-    sourceCompatibility = '21'
+ext {
+    set('springCloudVersion', "2023.0.0")
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+allprojects {
+    group = 'com.hwann'
+    version = '0.0.1-SNAPSHOT'
+
+    repositories {
+        mavenCentral()
+    }
+
+    java {
+        sourceCompatibility = '21'
+    }
 }
 
 configurations {
@@ -18,40 +38,22 @@ configurations {
     }
 }
 
-repositories {
-    mavenCentral()
-}
+subprojects {
+    apply plugin: 'java'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
 
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
-    implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-mail'
-    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
-    implementation 'io.jsonwebtoken:jjwt:0.9.1'
-    implementation 'com.sun.xml.bind:jaxb-impl:4.0.1'
-    implementation 'com.sun.xml.bind:jaxb-core:4.0.1'
-    implementation 'javax.xml.bind:jaxb-api:2.4.0-b180830.0359'
-    compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
-    implementation 'io.lettuce:lettuce-core:6.3.2.RELEASE'
-    annotationProcessor 'org.projectlombok:lombok'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'org.springframework.security:spring-security-test'
-}
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+    }
 
-jar {
-    enabled = false
-}
+    tasks.named('bootJar') {
+        enabled = false
+    }
 
-bootJar {
-    archiveFileName = 'marketmate.jar'
-    mainClassName = 'com.hwann.marketmate.MarketmateApplication'
-}
-
-tasks.named('test') {
-    useJUnitPlatform()
+    tasks.named('jar') {
+        enabled = true
+    }
 }

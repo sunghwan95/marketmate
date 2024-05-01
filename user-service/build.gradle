@@ -1,19 +1,14 @@
-plugins {
-    id 'java'
-}
-
-group = 'com.hwann'
-version = '0.0.1-SNAPSHOT'
-
-repositories {
-    mavenCentral()
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
-}
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'io.lettuce:lettuce-core:6.3.2.RELEASE'
 
-test {
-    useJUnitPlatform()
+    runtimeOnly 'com.mysql:mysql-connector-j'
 }
