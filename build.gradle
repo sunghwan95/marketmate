@@ -9,29 +9,6 @@ repositories {
     mavenCentral()
 }
 
-ext {
-    set('springCloudVersion', "2023.0.0")
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-    }
-}
-
-allprojects {
-    group = 'com.hwann'
-    version = '0.0.1-SNAPSHOT'
-
-    repositories {
-        mavenCentral()
-    }
-
-    java {
-        sourceCompatibility = '21'
-    }
-}
-
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
@@ -39,9 +16,17 @@ configurations {
 }
 
 subprojects {
+    group = 'com.hwann'
+    version = '0.0.1-SNAPSHOT'
+    sourceCompatibility = '21'
+
     apply plugin: 'java'
     apply plugin: 'org.springframework.boot'
     apply plugin: 'io.spring.dependency-management'
+
+    repositories {
+        mavenCentral()
+    }
 
     dependencies {
         implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -55,5 +40,21 @@ subprojects {
 
     tasks.named('jar') {
         enabled = true
+    }
+
+    ext {
+        set('springCloudVersion', "2023.0.0")
+    }
+
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+        }
+    }
+}
+
+project(':api-gateway') {
+    dependencies {
+        implementation project(':user-service')
     }
 }

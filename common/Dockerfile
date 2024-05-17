@@ -21,8 +21,9 @@ COPY src /app/src
 # Gradle 실행 권한 부여 및 빌드 실행 (테스트 스킵)
 RUN chmod +x ./gradlew && ./gradlew clean build bootJar -x test
 
-# 빌드된 JAR 파일 복사
-COPY build/libs/*.jar userModule.jar
-
-# 애플리케이션 실행
-ENTRYPOINT ["java","-jar","userModule.jar"]
+ARG JAR_FILE=build/libs/*.jar
+ENV TZ=Asia/Seoul
+COPY ${JAR_FILE} CommonService.jar
+COPY /src/main/resources/application.yml application.yml
+CMD ["./gradlew", "clean", "build"]
+ENTRYPOINT ["java","-jar","CommonService.jar"]

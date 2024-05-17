@@ -10,7 +10,7 @@ services:
       - mysql
       - redis
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/marketmate?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql-user:3306/marketmate?serverTimezone=Asia/Seoul&useSSL=false&allowPublicKeyRetrieval=true
       - SPRING_DATASOURCE_USERNAME=root
       - SPRING_DATASOURCE_PASSWORD=tjdghks9471
       - SPRING_REDIS_HOST=redis
@@ -24,9 +24,9 @@ services:
     networks:
       - network
 
-  mysql:
+  mysql-user:
     image: mysql:latest
-    container_name: mysql
+    container_name: mysql-user
     environment:
       MYSQL_ROOT_PASSWORD: tjdghks9471
     ports:

@@ -9,6 +9,6 @@ public class WebClientConfig {
 
     @Bean
     public WebClient webClient() {
-        return WebClient.create("http://user-service"); // user-service는 사용자 정보를 관리하는 마이크로서비스의 주소입니다.
+        return WebClient.create("http://user-service");
     }
 }

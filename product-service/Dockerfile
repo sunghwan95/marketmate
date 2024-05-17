@@ -22,7 +22,7 @@ COPY src /app/src
 RUN chmod +x ./gradlew && ./gradlew clean build bootJar -x test
 
 # 빌드된 JAR 파일 복사
-COPY build/libs/*.jar marketmate.jar
+COPY build/libs/*.jar productService.jar
 
 # 애플리케이션 실행
-ENTRYPOINT ["java","-jar","marketmate.jar"]
+ENTRYPOINT ["java","-jar","productService.jar"]

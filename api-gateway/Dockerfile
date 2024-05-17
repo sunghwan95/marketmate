@@ -14,15 +14,15 @@ WORKDIR /app
 # Gradle 래퍼와 프로젝트 파일 복사
 COPY gradlew /app/
 COPY gradle /app/gradle
-COPY build.gradle /app/
-COPY settings.gradle /app/
+COPY ../build.gradle /app/
+COPY ../settings.gradle /app/
 COPY src /app/src
 
-# Gradle 실행 권한 부여 및 빌드 실행 (테스트 스킵)
+# Gradle 실행 권한 부여 및 빌드 실행
 RUN chmod +x ./gradlew && ./gradlew clean build bootJar -x test
 
 # 빌드된 JAR 파일 복사
-COPY build/libs/*.jar wishlistService.jar
+COPY build/libs/*.jar apiGateway.jar
 
 # 애플리케이션 실행
-ENTRYPOINT ["java","-jar","wishlistService.jar"]
+ENTRYPOINT ["java","-jar","apiGateway.jar"]

@@ -1,19 +1,46 @@
-plugins {
-    id 'java'
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
-group = 'com.hwann'
-version = '0.0.1-SNAPSHOT'
-
-repositories {
-    mavenCentral()
+ext {
+    set('springCloudVersion', "2023.0.0")
 }
+
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    // mysql 의존성
+    runtimeOnly 'com.mysql:mysql-connector-j'
+    // redis 의존성
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.cloud:spring-cloud-config-client'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
 }
 
-test {
+bootJar {
+    enabled = true
+    mainClass = "com.hwann.common.CommonServiceApplication"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
+}
+
+tasks.named('test') {
     useJUnitPlatform()
 }
