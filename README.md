@@ -1,5 +1,4 @@
 # 대규모 예약 구매 요청을 처리하는 e-커머스 플랫폼
-![spring](./images/spring.png)
 ## 1. 프로젝트 소개
 
 이 프로젝트는 대규모 예약 구매 요청을 효율적으로 처리하는 e-커머스 플랫폼. 불특정 다수의 고객이 특정 제품을 대량으로 예약 구매할 수 있도록 지원하며, 이를 통해 공급망 관리와 재고 최적화를 극대화합니다.
@@ -14,8 +13,8 @@
 본 프로젝트는 MSA(Microservices Architecture)를 채택하여 다음과 같은 구성 요소들로 이루어져 있습니다:
 
 ### (1) 주요 기술 스택
-- **Backend**: Spring Boot, Spring Data JPA, Spring Security
-- **Database**: MySQL, Redis
+- **Backend**: Java21,Spring Boot 3.2.5, Spring Data JPA, Spring Security
+- **Database**: MySQL8.0, Redis
 - **Microservices Architecture**: Eureka, Spring Cloud Gateway, Circuit Breaker
 - **Containerization**: Docker
 - **Testing**: Apache JMeter
