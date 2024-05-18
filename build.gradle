@@ -53,8 +53,37 @@ subprojects {
     }
 }
 
-project(':api-gateway') {
+project(':email-service') {
     dependencies {
         implementation project(':user-service')
     }
+}
+project(':order-service') {
+    dependencies {
+        implementation project(':product-service')
+    }
+}
+project(':cart-service') {
+    dependencies {
+        implementation project(':product-service')
+    }
+}
+project(':wishlist-service') {
+    dependencies {
+        implementation project(':product-service')
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
+
+tasks.withType(JavaCompile) {
+    options.compilerArgs << '-parameters'
 }
