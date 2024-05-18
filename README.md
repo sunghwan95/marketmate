@@ -13,14 +13,14 @@
 
 본 프로젝트는 MSA(Microservices Architecture)를 채택하여 다음과 같은 구성 요소들로 이루어져 있습니다:
 
-### 주요 기술 스택
+### (1) 주요 기술 스택
 - **Backend**: Spring Boot, Spring Data JPA, Spring Security
 - **Database**: MySQL, Redis
 - **Microservices Architecture**: Eureka, Spring Cloud Gateway, Circuit Breaker
 - **Containerization**: Docker
 - **Testing**: Apache JMeter
 
-### 서비스 구성
+### (2) 서비스 구성
 1. **Eureka (Service Discovery)**
     - 모든 마이크로서비스가 Eureka 서버에 자신을 등록하여 동적 서비스 디스커버리 및 로드 밸런싱을 구현.
 
@@ -37,7 +37,7 @@
 5. **Docker**
     - 각 마이크로서비스를 컨테이너화하여 일관된 개발 환경 제공 및 배포 자동화.
 
-### 아키텍처 다이어그램
+### (3) 아키텍처 다이어그램
 #### ERD
 ![ERD IMAGE](./images/erd_0427.png)
 #### 아키텍처
@@ -45,7 +45,7 @@
 
 ## 3. 트러블 슈팅
 
-### Redis와 MySQL 간의 데이터 불일치 문제 해결
+### (1) Redis와 MySQL 간의 데이터 불일치 문제 해결
 #### 문제 상황
 동시 다발적인 재고 조회 및 업데이트 시 Redis 캐시와 MySQL 데이터베이스 간의 데이터 불일치 문제가 발생.
 
@@ -55,5 +55,5 @@ Redis의 분산 락 기능을 사용하여 데이터 일관성 문제를 해결.
 - **락 획득 후 작업 수행**: 분산 락을 획득한 경우에만 Redis와 MySQL에서 재고 데이터를 일관성 있게 조회 및 업데이트.
 - **락 해제**: 작업이 완료되면 락을 해제하여 다른 쓰레드가 재고 데이터를 업데이트할 수 있도록 함.
 
-### redis write-through, write-back 전략 수립
+### (2) 재고 수량 관리 관련하여 Redis write-through, write-back 전략 수립
 #### 테스트툴 이미지 캡쳐 후 첨부할 예정
