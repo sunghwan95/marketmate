@@ -8,7 +8,6 @@ docker-compose.yaml
 mysql/data/
 /.env
 application.properties
-images
 
 ### STS ###
 .apt_generated
